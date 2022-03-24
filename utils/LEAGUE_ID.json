@@ -1,0 +1,42 @@
+[
+  {
+    "id": 39,
+    "name": "Premier League",
+    "country": {
+      "name": "England",
+      "code": "GB"
+    }
+  },
+  {
+    "id": 135,
+    "name": "Serie A",
+    "country": {
+      "name": "Italy",
+      "code": "IT"
+    }
+  },
+  {
+    "id": 140,
+    "name": "La Liga",
+    "country": {
+      "name": "Spain",
+      "code": "ES"
+    }
+  },
+  {
+    "id": 78,
+    "name": "Bundesliga 1",
+    "country": {
+      "name": "Germany",
+      "code": "DE"
+    }
+  },
+  {
+    "id": 61,
+    "name": "Ligue 1",
+    "country": {
+      "name": "France",
+      "code": "FR"
+    }
+  }
+]
