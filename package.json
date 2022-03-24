@@ -6,9 +6,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "@types/react-table": "^7.7.10",
+    "axios": "^0.26.1",
     "next": "latest",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-table": "^7.7.0"
   },
   "devDependencies": {
     "@types/node": "17.0.4",

@@ -9,7 +9,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Create Next App</title>
+        <title>DevEx Football</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

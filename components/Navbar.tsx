@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 
-const Navbar = () => {
+const Navbar: FunctionComponent = () => {
   return (
     <div>Navbar</div>
   )
