@@ -1,15 +1,16 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import type { NextPage, GetStaticProps } from 'next'
+import type { NextPage, GetServerSideProps } from 'next'
 import { useCallback, useMemo } from 'react'
 
 import { StandingsTable } from '../../components'
 import { DATA } from '../../utils'
 
-interface Props {
+type Props = {
+  name: string
   standings: Array<any>
 }
 
-const League: NextPage<Props> = ({ standings }: Props) => {
+const League: NextPage<Props> = ({ name, standings }: Props) => {
   const formatStandings = useCallback((unformattedData: typeof standings) => {
     let formattedData = []
 
@@ -39,38 +40,53 @@ const League: NextPage<Props> = ({ standings }: Props) => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <StandingsTable standings={formattedStandings} />
+      <StandingsTable name={name} standings={formattedStandings} />
     </div>
   )
 }
 
 export default League
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const id = query.id
+  const name = query.name
+  const season = query.season
+
   const options: AxiosRequestConfig = {
     method: 'GET',
     url: 'https://api-football-v1.p.rapidapi.com/v3/standings',
-    params: { season: '2021', league: '39' },
+    params: { season: season, league: id },
     headers: {
       'X-RapidAPI-Host': process.env.RAPIDAPI_URL,
       'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
     },
   }
 
-  /* Currently using static DATA for dev purposes */
+  /* API Call */
   // const data = await axios
   //   .request(options)
   //   .then((response) => {
-  //     return response.data.response[0].league.standings[0] 
+  //     if (response.data.response.length < 1) return []
+
+  //     return response.data.response[0].league.standings[0]
   //   })
   //   .catch((error) => {
   //     console.error(error)
-  //   })  
+  //   })
 
-    return {
-      props: {
-        standings: DATA,
-        // standings: data,
-      }
-    }
+  // return {
+  //   props: {
+  //     name: name,
+  //     standings: data,
+  //   },
+  // }
+  
+
+  /* Static Data */
+  return {
+    props: {
+      name: 'League',
+      standings: DATA,
+    },
+  }
 }
