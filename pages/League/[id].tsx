@@ -1,46 +1,23 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import type { NextPage, GetServerSideProps } from 'next'
-import { useCallback, useMemo } from 'react'
 
-import { StandingsTable } from '../../components'
-import { DATA } from '../../utils'
+import { LeagueTable, LeagueStatTable } from '../../components'
 
 type Props = {
   name: string
   standings: Array<any>
+  statistics: any
 }
 
-const League: NextPage<Props> = ({ name, standings }: Props) => {
-  const formatStandings = useCallback((unformattedData: typeof standings) => {
-    let formattedData = []
-
-    for (let team of unformattedData) {
-      formattedData.push({
-        rank: team.rank,
-        team: team.team.name,
-        played: team.all.played,
-        wins: team.all.win,
-        draws: team.all.draw,
-        losses: team.all.lose,
-        goalsFor: team.all.goals.for,
-        goalsAgainst: team.all.goals.against,
-        goalsDiff: team.goalsDiff,
-        points: team.points,
-        form: team.form,
-      })
-    }
-
-    return formattedData
-  }, [])
-
-  const formattedStandings = useMemo(
-    () => formatStandings(standings),
-    [standings]
-  )
-
+const League: NextPage<Props> = ({ name, standings, statistics }: Props) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <StandingsTable name={name} standings={formattedStandings} />
+      <LeagueTable name={name} standings={standings} />
+      <LeagueStatTable
+        name="Red Cards"
+        accessor="cards.red"
+        statistic={statistics.cards.red}
+      />
     </div>
   )
 }
@@ -52,41 +29,52 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const name = query.name
   const season = query.season
 
-  const options: AxiosRequestConfig = {
+  // Header options for standings
+  const standingsOptions: AxiosRequestConfig = {
     method: 'GET',
-    url: 'https://api-football-v1.p.rapidapi.com/v3/standings',
-    params: { season: season, league: id },
-    headers: {
-      'X-RapidAPI-Host': process.env.RAPIDAPI_URL,
-      'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+    url: `${process.env.BASE_URL}/api/league/standings`,
+    params: {
+      league: id,
+      season: season,
     },
   }
 
-  /* API Call */
-  // const data = await axios
-  //   .request(options)
-  //   .then((response) => {
-  //     if (response.data.response.length < 1) return []
+  const data: any = await axios
+    .request(standingsOptions)
+    .then(async (standingsResponse) => {
+      const standingsData = standingsResponse.data
 
-  //     return response.data.response[0].league.standings[0]
-  //   })
-  //   .catch((error) => {
-  //     console.error(error)
-  //   })
+      // Header options for statistics
+      const statisticsOptions: AxiosRequestConfig = {
+        method: 'GET',
+        url: `${process.env.BASE_URL}/api/league/statistics`,
+        params: {
+          league: id,
+          season: season,
+          team: standingsData.map((team: any) => team.id)
+        }
+      }
 
-  // return {
-  //   props: {
-  //     name: name,
-  //     standings: data,
-  //   },
-  // }
+      const statistics: Array<any> = await axios
+        .request(statisticsOptions)
+        .then((statisticsResponse) => {
+          return statisticsResponse.data
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+
+      return { standings: standingsData, statistics: statistics }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
   
-
-  /* Static Data */
   return {
     props: {
-      name: 'League',
-      standings: DATA,
+      name: name,
+      standings: data.standings,
+      statistics: data.statistics,
     },
   }
 }
