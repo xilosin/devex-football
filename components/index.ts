@@ -1,2 +1,3 @@
 export { default as Navbar } from './Navbar'
-export { default as StandingsTable } from './StandingsTable'
+export { default as LeagueTable } from './LeagueTable'
+export { default as LeagueStatTable } from './LeagueStatTable'
