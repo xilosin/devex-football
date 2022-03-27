@@ -1,2 +1,6 @@
-export { default as DATA } from './STANDINGS_DATA.json'
+// Static Custom Data
 export { default as LEAGUES } from './LEAGUES.json'
+
+// Static API Data
+export { default as STANDINGS } from './STANDINGS.json'
+export { default as STATISTICS } from './STATISTICS.json' 
