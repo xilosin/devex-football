@@ -4,12 +4,13 @@ import { Column, useTable } from 'react-table'
 
 type Props = {
   name: string
-  standings: Array<Data>
+  standings: Array<Team>
 }
 
-type Data = {
+type Team = {
   rank: number
-  team: string
+  name: string
+  id: number,
   played: number
   wins: number
   draws: number
@@ -21,7 +22,7 @@ type Data = {
   form: string
 }
 
-export const StandingsTable = ({ name, standings }: Props) => {
+export const LeagueTable = ({ name, standings }: Props) => {
   const Form = useCallback((formString: string) => {
     const SingleForm = (formChar: string, route: string, bgColor: string) => {
       return (
@@ -62,7 +63,7 @@ export const StandingsTable = ({ name, standings }: Props) => {
     )
   }, [])
 
-  const columns: Array<Column<Data>> = useMemo(
+  const columns: Array<Column<Team>> = useMemo(
     () => [
       {
         Header: 'Rank',
@@ -70,7 +71,7 @@ export const StandingsTable = ({ name, standings }: Props) => {
       },
       {
         Header: 'Team',
-        accessor: 'team',
+        accessor: 'name',
         Cell: (e) => (
           <Link href={e.value} passHref>
             <a className="hover:underline">{e.value}</a>
@@ -117,7 +118,7 @@ export const StandingsTable = ({ name, standings }: Props) => {
     ],
     []
   )
-  const data: Array<Data> = useMemo(() => standings, [])
+  const data: Array<Team> = useMemo(() => standings, [])
 
   const { getTableProps, getTableBodyProps, headerGroups, prepareRow, rows } =
     useTable({ columns, data })
@@ -162,4 +163,4 @@ export const StandingsTable = ({ name, standings }: Props) => {
   )
 }
 
-export default StandingsTable
+export default LeagueTable
