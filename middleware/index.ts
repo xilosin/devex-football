@@ -1,0 +1,1 @@
+export { default as withLeague } from './League/withLeague'
