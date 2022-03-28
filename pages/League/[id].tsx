@@ -1,11 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import type { NextPage, GetServerSideProps } from 'next'
-
 import { 
   LeagueStandings, 
   LeagueTeamsStats, 
   LeaguePlayersStats 
 } from '../../components'
+
 
 type Props = {
   name: string
