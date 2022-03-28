@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import type { NextPage, GetServerSideProps } from 'next'
 
-import { LeagueStandings, LeagueStatistics } from '../../components'
+import { LeagueStandings, LeagueTeamsStatistics } from '../../components'
 
 type Props = {
   name: string
@@ -15,7 +15,7 @@ const League: NextPage<Props> = ({ name, standings, statistics }: Props) => {
       <div className='grid grid-cols-12 w-full lg:w-[1012px]'>
         <div className="col-span-12 lg:col-span-8 flex flex-col items-stretch justify-start">
           <LeagueStandings name={name} standings={standings} />
-          <LeagueStatistics name={name} statistics={statistics}/>
+          <LeagueTeamsStatistics name={name} statistics={statistics}/>
         </div>
         <div className="col-span-4 hidden lg:flex lg:flex-col bg-gray-300 items-center justify-center">
           Hello

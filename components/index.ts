@@ -1,4 +1,4 @@
 export { default as Navbar } from './Navbar'
 export { default as LeagueStandings } from './LeagueStandings'
-export { default as LeagueStatistics } from './LeagueStatistics'
-export { default as StatTable } from './StatTable'
+export { default as LeagueTeamsStatistics } from './LeagueTeamsStatistics'
+export { default as StatisticTable } from './StatisticTable'
