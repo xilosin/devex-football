@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import type { NextPage, GetServerSideProps } from 'next'
 
-import { LeagueTable, LeagueStatTable } from '../../components'
+import { LeagueStandings, LeagueStatistics } from '../../components'
 
 type Props = {
   name: string
@@ -11,13 +11,16 @@ type Props = {
 
 const League: NextPage<Props> = ({ name, standings, statistics }: Props) => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <LeagueTable name={name} standings={standings} />
-      <LeagueStatTable
-        name="Red Cards"
-        accessor="cards.red"
-        statistic={statistics.cards.red}
-      />
+    <div className='flex w-full flex-col items-center justify-center'>
+      <div className='grid grid-cols-12 w-full lg:w-[1012px]'>
+        <div className="col-span-12 lg:col-span-8 flex flex-col items-stretch justify-start">
+          <LeagueStandings name={name} standings={standings} />
+          <LeagueStatistics name={name} statistics={statistics}/>
+        </div>
+        <div className="col-span-4 hidden lg:flex lg:flex-col bg-gray-300 items-center justify-center">
+          Hello
+        </div>
+      </div>
     </div>
   )
 }
@@ -43,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     .request(standingsOptions)
     .then(async (standingsResponse) => {
       const standingsData = standingsResponse.data
-
+      
       // Header options for statistics
       const statisticsOptions: AxiosRequestConfig = {
         method: 'GET',
