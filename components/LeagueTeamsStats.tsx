@@ -1,12 +1,12 @@
 import React from 'react'
-import { StatTable } from '../components'
+import { StatTable } from '.'
 
 type Props = {
   name: string
   statistics: any
 }
 
-const LeagueStatistics = ({ name, statistics }: Props) => {
+const LeagueTeamStats = ({ name, statistics }: Props) => {
   return (
     <>
       <h1 className="mb-1 text-2xl font-semibold">{name} Statistics</h1>
@@ -58,4 +58,4 @@ const LeagueStatistics = ({ name, statistics }: Props) => {
   )
 }
 
-export default LeagueStatistics
+export default LeagueTeamStats
