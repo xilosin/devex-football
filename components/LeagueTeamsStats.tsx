@@ -9,7 +9,7 @@ type Props = {
 const LeagueTeamStats = ({ name, statistics }: Props) => {
   return (
     <>
-      <h1 className="mb-1 text-2xl font-semibold">{name} Statistics</h1>
+      <h1 className="mb-1 text-2xl font-semibold">{name} Teams Statistics</h1>
       <div className="w-full flex flex-row flex-wrap mb-4">
         <StatTable
           name="Clean sheets"

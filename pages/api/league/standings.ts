@@ -5,9 +5,12 @@ import axios, { AxiosRequestConfig } from 'axios'
 import { STANDINGS } from '../../../utils'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const formatStandings = (unformattedStandings: Array<any>) => {
+  const formatData = (data: string) => {
+    const unformattedData = JSON.parse(data)
+    const standings = unformattedData.response[0].league.standings[0]
+
     // Returns a new array of formatted data
-    return unformattedStandings.map((team) => {
+    const formattedData = standings.map((team: any) => {
       return {
         rank: team.rank,
         name: team.team.name,
@@ -23,6 +26,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         form: team.form,
       }
     })
+
+    return JSON.stringify(formattedData)
   }
   
   const params = req.query
@@ -35,20 +40,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       'X-RapidAPI-Host': process.env.RAPIDAPI_URL,
       'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
     },
+    transformResponse: [formatData]
   }
 
   /* OFFICIAL: API Data */
   // const result = await axios
   //   .request(options)
   //   .then((response) => {
-  //     const data = response.data.response
-      
-  //     if (data.length < 1) return []
-
-  //     const standings: Array<any> = response.data.response[0].league.standings[0]
-      
-  //     return formatStandings(standings)
-      
+  //     return JSON.parse(response.data)
   //   })
   //   .catch((error) => {
   //     console.error(error)
@@ -57,7 +56,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // res.status(200).json(result) 
 
   /* TEST: Static Data */
-  res.status(200).json(formatStandings(STANDINGS))    
+  const staticData = {
+    response: [
+      {
+        league: {
+          standings: [STANDINGS]
+        }
+      }
+    ]
+  }
+  res.status(200).json(JSON.parse(formatData(JSON.stringify(staticData))))    
 }
 
 export default handler

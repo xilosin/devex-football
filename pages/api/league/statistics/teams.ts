@@ -1,11 +1,15 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import axios, { AxiosRequestConfig } from 'axios'
+import fs from 'fs'
 
-import { TEAMS } from '../../../utils'
+import { TEAMS } from '../../../../utils'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const formatTeams = (unformattedTeams: Array<any>) => {
+  const formatData = (data: string) => {
+    const unformattedData = JSON.parse(data)
+    const team = unformattedData.response
+
     const countCards = (unformattedCards: Object) => {
       let total: number = 0
       Object.values(unformattedCards).forEach((cards) => {
@@ -17,44 +21,45 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     /* Returns a new array of formatted data */
-    return unformattedTeams.map((team) => {
-      return {
-        id: team.team.id,
-        name: team.team.name,
-        cards: {
-          red: {
-            total: countCards(team.cards.red),
-          },
-          yellow: {
-            total: countCards(team.cards.yellow),
-          },
+    const formattedData = {
+      id: team.team.id,
+      name: team.team.name,
+      cards: {
+        red: {
+          total: countCards(team.cards.red),
         },
-        cleanSheets: team.clean_sheet,
-        failedToScore: team.failed_to_score,
-        fixtures: team.fixtures,
-        goals: {
-          against: {
-            average: team.goals.against.average,
-            season: team.goals.against.total,
-          },
-          for: {
-            average: team.goals.for.average,
-            season: team.goals.for.total,
-          },
+        yellow: {
+          total: countCards(team.cards.yellow),
         },
-        penalties: {
-          missed: {
-            total: team.penalty.missed.total,
-          },
-          scored: {
-            total: team.penalty.scored.total,
-          },
-          awarded: {
-            total: team.penalty.total,
-          },
+      },
+      cleanSheets: team.clean_sheet,
+      failedToScore: team.failed_to_score,
+      fixtures: team.fixtures,
+      goals: {
+        against: {
+          average: team.goals.against.average,
+          season: team.goals.against.total,
         },
-      }
-    })
+        for: {
+          average: team.goals.for.average,
+          season: team.goals.for.total,
+        },
+      },
+      penalties: {
+        missed: {
+          total: team.penalty.missed.total,
+        },
+        scored: {
+          total: team.penalty.scored.total,
+        },
+        awarded: {
+          total: team.penalty.total,
+        },
+      },
+    }
+
+    return JSON.stringify(formattedData)
+   
   }
 
   const generateStatistics = (teams: Array<any>) => {
@@ -110,7 +115,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   /* req.query of Type { league: number, season: number, team: Array<number>} */
   const params = req.query
-  const teamIds = params['team[]']
+  const teamIds = params['teams[]']
 
   // @ts-ignore
   const options: Array<AxiosRequestConfig> = teamIds.map((id) => {
@@ -126,6 +131,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         'X-RapidAPI-Host': process.env.RAPIDAPI_URL,
         'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
       },
+      transformResponse: [formatData],
     }
   })
 
@@ -133,18 +139,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // const result = await axios
   //   .all(options.map((option) => axios.request(option)))
   //   .then((responses) => {
-  //     const data = responses.map((response) => response.data.response)
-  //     const teams = formatTeams(data)
-  //     return generateStatistics(teams)
+  //     const data = responses.map((response) => JSON.parse(response.data))
+  //     return generateStatistics(data)
   //   })
   //   .catch((errors) => {
   //     console.log(errors)
   //   })
-
+  
   // res.status(200).json(result)
 
   /* TESTING: Static Data */
-  res.status(200).json(generateStatistics(formatTeams(TEAMS)))
+  const teams = TEAMS.map((team) => JSON.stringify({ response: team}))
+  res.status(200).json(generateStatistics(teams.map((team) => JSON.parse(formatData(team)))))
 }
 
 export default handler

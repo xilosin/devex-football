@@ -1,11 +1,10 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import type { NextPage, GetServerSideProps } from 'next'
-import { 
-  LeagueStandings, 
-  LeagueTeamsStats, 
-  LeaguePlayersStats 
+import {
+  LeagueStandings,
+  LeagueTeamsStats,
+  LeaguePlayersStats,
 } from '../../components'
-
 
 type Props = {
   name: string
@@ -15,14 +14,14 @@ type Props = {
 
 const League: NextPage<Props> = ({ name, standings, statistics }: Props) => {
   return (
-    <div className='flex w-full flex-col items-center justify-center'>
-      <div className='grid grid-cols-12 w-full lg:w-[1012px]'>
-        <div className="col-span-12 lg:col-span-8 flex flex-col items-stretch justify-start">
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="grid w-full grid-cols-12 lg:w-[1012px]">
+        <div className="col-span-12 flex flex-col items-stretch justify-start lg:col-span-8">
           <LeagueStandings name={name} standings={standings} />
-          <LeagueTeamsStats name={name} statistics={statistics}/>
-          <LeaguePlayersStats name={name} statistics={statistics} />
+          <LeagueTeamsStats name={name} statistics={statistics.teams} />
+          <LeaguePlayersStats name={name} statistics={statistics.players} />
         </div>
-        <div className="col-span-4 hidden lg:flex lg:flex-col bg-gray-300 items-center justify-center">
+        <div className="col-span-4 hidden items-center justify-center bg-gray-300 lg:flex lg:flex-col">
           Hello
         </div>
       </div>
@@ -51,20 +50,33 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     .request(standingsOptions)
     .then(async (standingsResponse) => {
       const standingsData = standingsResponse.data
-      
-      // Header options for statistics
-      const statisticsOptions: AxiosRequestConfig = {
+
+      // Header options for team statistics
+      const teamsStatisticsOptions: AxiosRequestConfig = {
         method: 'GET',
-        url: `${process.env.BASE_URL}/api/league/statistics`,
+        url: `${process.env.BASE_URL}/api/league/statistics/teams`,
         params: {
           league: id,
           season: season,
-          team: standingsData.map((team: any) => team.id)
-        }
+          teams: standingsData.map((team: any) => team.id),
+        },
       }
 
-      const statistics: Array<any> = await axios
-        .request(statisticsOptions)
+      // Header options for player statistics
+      const urls = ['topscorers', 'topassists', 'topredcards', 'topyellowcards']
+      const playersStatisticsOptions: AxiosRequestConfig = {
+        method: 'GET',
+        url: `${process.env.BASE_URL}/api/league/statistics/players`,
+        params: {
+          league: id,
+          season: season,
+          urls: urls,
+        },
+      }
+
+      // API call for team statistics
+      const teamsStatistics: Array<any> = await axios
+        .request(teamsStatisticsOptions)
         .then((statisticsResponse) => {
           return statisticsResponse.data
         })
@@ -72,17 +84,29 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           console.error(error)
         })
 
-      return { standings: standingsData, statistics: statistics }
+      // API call for player statistics
+      const playersStatistics: Array<any> = await axios
+        .request(playersStatisticsOptions)
+        .then((statisticsResponse) => {
+          return statisticsResponse.data
+        })
+
+      return {
+        standings: standingsData,
+        statistics: { 
+          teams: teamsStatistics, 
+          players: playersStatistics 
+        },
+      }
     })
     .catch((error) => {
       console.error(error)
     })
-  
+
   return {
     props: {
       name: name,
-      standings: data.standings,
-      statistics: data.statistics,
+      ...data,
     },
   }
 }
